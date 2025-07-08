@@ -1,4 +1,3 @@
-import logging
 from oauth2client.client import (
     flow_from_clientsecrets,
     FlowExchangeError,
@@ -13,6 +12,7 @@ import pydantic
 import json
 import argparse
 
+from .logs import logger
 
 def get_gauth_file() -> str:
     parser = argparse.ArgumentParser()
@@ -123,14 +123,14 @@ def get_stored_credentials(user_id: str) -> OAuth2Credentials | None:
 
         cred_file_path = _get_credential_filename(user_id=user_id)
         if not os.path.exists(cred_file_path):
-            logging.warning(f"No stored Oauth2 credentials yet at path: {cred_file_path}")
+            logger.warning(f"No stored Oauth2 credentials yet at path: {cred_file_path}")
             return None
 
         with open(cred_file_path, 'r') as f:
             data = f.read()
             return Credentials.new_from_json(data)
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
         return None
 
     raise None
@@ -163,7 +163,7 @@ def exchange_code(authorization_code):
         credentials = flow.step2_exchange(authorization_code)
         return credentials
     except FlowExchangeError as error:
-        logging.error('An error occurred: %s', error)
+        logger.error('An error occurred: %s', error)
         raise CodeExchangeException(None)
 
 
@@ -183,7 +183,7 @@ def get_user_info(credentials):
     try:
         user_info = user_info_service.userinfo().get().execute()
     except Exception as e:
-        logging.error(f'An error occurred: {e}')
+        logger.error(f'An error occurred: {e}')
     if user_info and user_info.get('id'):
         return user_info
     else:
@@ -204,7 +204,7 @@ def get_authorization_url(email_address, state):
     flow.params['approval_prompt'] = 'force'
     flow.params['user_id'] = email_address
     flow.params['state'] = state
-    return flow.step1_get_authorize_url(state=state)
+    return str(flow.step1_get_authorize_url(state=state))
 
 
 def get_credentials(authorization_code, state):
@@ -234,7 +234,7 @@ def get_credentials(authorization_code, state):
         credentials = exchange_code(authorization_code)
         user_info = get_user_info(credentials)
         import json
-        logging.error(f"user_info: {json.dumps(user_info)}")
+        logger.error(f"user_info: {json.dumps(user_info)}")
         email_address = user_info.get('email')
         
         if credentials.refresh_token is not None:
@@ -245,14 +245,14 @@ def get_credentials(authorization_code, state):
             if credentials and credentials.refresh_token is not None:
                 return credentials
     except CodeExchangeException as error:
-        logging.error('An error occurred during code exchange.')
+        logger.error('An error occurred during code exchange.')
         # Drive apps should try to retrieve the user and credentials for the current
         # session.
         # If none is available, redirect the user to the authorization URL.
         error.authorization_url = get_authorization_url(email_address, state)
         raise error
     except NoUserIdException:
-        logging.error('No user ID could be retrieved.')
+        logger.error('No user ID could be retrieved.')
         # No refresh token has been retrieved.
     authorization_url = get_authorization_url(email_address, state)
     raise NoRefreshTokenException(authorization_url)

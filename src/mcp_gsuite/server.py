@@ -1,5 +1,3 @@
-
-import logging
 from collections.abc import Sequence
 from functools import lru_cache
 import subprocess
@@ -17,6 +15,7 @@ from mcp.types import (
 )
 import json
 from . import gauth
+from .logs import logger
 from http.server import BaseHTTPRequestHandler,HTTPServer
 from urllib.parse import (
     urlparse,
@@ -51,18 +50,13 @@ class OauthListener(BaseHTTPRequestHandler):
 
         
 
+# Load environment variables
 load_dotenv()
 
 from . import tools_gmail
 from . import tools_calendar
 from . import toolhandler
 
-
-# Load environment variables
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("mcp-gsuite")
 
 def start_auth_flow(user_id: str):
     auth_url = gauth.get_authorization_url(user_id, state={})
@@ -103,7 +97,7 @@ app = Server("mcp-gsuite")
 tool_handlers = {}
 def add_tool_handler(tool_class: toolhandler.ToolHandler):
     global tool_handlers
-
+    logger.debug(f"Tool registered: {tool_class.name}")
     tool_handlers[tool_class.name] = tool_class
 
 def get_tool_handler(name: str) -> toolhandler.ToolHandler | None:
@@ -129,7 +123,7 @@ add_tool_handler(tools_calendar.DeleteCalendarEventToolHandler())
 @app.list_tools()
 async def list_tools() -> list[Tool]:
     """List available tools."""
-
+    logger.debug("Listing tools")
     return [th.get_tool_description() for th in tool_handlers.values()]
 
 
@@ -148,10 +142,11 @@ async def call_tool(name: str, arguments: Any) -> Sequence[TextContent | ImageCo
         if not tool_handler:
             raise ValueError(f"Unknown tool: {name}")
 
+        logger.info(f"Running tool: {name}")
         return tool_handler.run_tool(arguments)
     except Exception as e:
-        logging.error(traceback.format_exc())
-        logging.error(f"Error during call_tool: str(e)")
+        logger.error(traceback.format_exc())
+        logger.error(f"Error during call_tool: {str(e)}")
         raise RuntimeError(f"Caught Exception. Error: {str(e)}")
 
 
@@ -161,11 +156,12 @@ async def main():
     for account in accounts:
         creds = gauth.get_stored_credentials(user_id=account.email)
         if creds:
-            logging.info(f"found credentials for {account.email}")
+            logger.info(f"Found credentials for: {account.email}")
 
     from mcp.server.stdio import stdio_server
 
     async with stdio_server() as (read_stream, write_stream):
+        logger.info("Starting GSuite MCP server")
         await app.run(
             read_stream,
             write_stream,

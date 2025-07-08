@@ -1,6 +1,6 @@
 from googleapiclient.discovery import build 
 from . import gauth
-import logging
+from .logs import logger
 import base64
 import traceback
 from email.mime.text import MIMEText
@@ -77,8 +77,8 @@ class GmailService():
             return metadata
 
         except Exception as e:
-            logging.error(f"Error parsing message: {str(e)}")
-            logging.error(traceback.format_exc())
+            logger.error(f"Error parsing message: {str(e)}")
+            logger.error(traceback.format_exc())
             return None
 
     def _extract_body(self, payload) -> str | None:
@@ -125,7 +125,7 @@ class GmailService():
             return None
 
         except Exception as e:
-            logging.error(f"Error extracting body: {str(e)}")
+            logger.error(f"Error extracting body: {str(e)}")
             return None
 
     def query_emails(self, query=None, max_results=100):
@@ -167,8 +167,8 @@ class GmailService():
             return parsed
             
         except Exception as e:
-            logging.error(f"Error reading emails: {str(e)}")
-            logging.error(traceback.format_exc())
+            logger.error(f"Error reading emails: {str(e)}")
+            logger.error(traceback.format_exc())
             return []
         
     def get_email_by_id_with_attachments(self, email_id: str) -> Tuple[dict, dict] | Tuple[None, dict]:
@@ -211,7 +211,7 @@ class GmailService():
                         attachments[part_id] = attachment
             else:
                 # Handle case when there are no parts (single part message)
-                logging.info(f"Email {email_id} does not have 'parts' in payload (likely single part message)")
+                logger.info(f"Email {email_id} does not have 'parts' in payload (likely single part message)")
                 if "payload" in message and "body" in message["payload"] and "attachmentId" in message["payload"]["body"]:
                     # Handle potential attachment in single part message
                     attachment_id = message["payload"]["body"]["attachmentId"]
@@ -226,8 +226,8 @@ class GmailService():
             return parsed_email, attachments
             
         except Exception as e:
-            logging.error(f"Error retrieving email {email_id}: {str(e)}")
-            logging.error(traceback.format_exc())
+            logger.error(f"Error retrieving email {email_id}: {str(e)}")
+            logger.error(traceback.format_exc())
             return None, {}
         
     def create_draft(self, to: str, subject: str, body: str, cc: list[str] | None = None) -> dict | None:
@@ -277,8 +277,8 @@ class GmailService():
             return draft
             
         except Exception as e:
-            logging.error(f"Error creating draft: {str(e)}")
-            logging.error(traceback.format_exc())
+            logger.error(f"Error creating draft: {str(e)}")
+            logger.error(traceback.format_exc())
             return None
         
     def delete_draft(self, draft_id: str) -> bool:
@@ -299,8 +299,8 @@ class GmailService():
             return True
             
         except Exception as e:
-            logging.error(f"Error deleting draft {draft_id}: {str(e)}")
-            logging.error(traceback.format_exc())
+            logger.error(f"Error deleting draft {draft_id}: {str(e)}")
+            logger.error(traceback.format_exc())
             return False
         
     def create_reply(self, original_message: dict, reply_body: str, send: bool = False, cc: list[str] | None = None) -> dict | None:
@@ -371,8 +371,8 @@ class GmailService():
             return result
             
         except Exception as e:
-            logging.error(f"Error {'sending' if send else 'drafting'} reply: {str(e)}")
-            logging.error(traceback.format_exc())
+            logger.error(f"Error {'sending' if send else 'drafting'} reply: {str(e)}")
+            logger.error(traceback.format_exc())
             return None
         
     def get_attachment(self, message_id: str, attachment_id: str) -> dict | None:
@@ -399,6 +399,6 @@ class GmailService():
             }
             
         except Exception as e:
-            logging.error(f"Error retrieving attachment {attachment_id} from message {message_id}: {str(e)}")
-            logging.error(traceback.format_exc())
+            logger.error(f"Error retrieving attachment {attachment_id} from message {message_id}: {str(e)}")
+            logger.error(traceback.format_exc())
             return None

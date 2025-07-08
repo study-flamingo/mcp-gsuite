@@ -2,6 +2,5 @@ from .server import main
 import asyncio
 
 if __name__ == "__main__":
-    """Main entry point for the package."""
+    """Alternate entry point for the package."""
     asyncio.run(main())
-    

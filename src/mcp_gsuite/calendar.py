@@ -1,6 +1,6 @@
 from googleapiclient.discovery import build
 from . import gauth
-import logging
+from .logs import logger
 import traceback
 from datetime import datetime
 import pytz
@@ -38,8 +38,8 @@ class CalendarService():
             return calendars
                 
         except Exception as e:
-            logging.error(f"Error retrieving calendars: {str(e)}")
-            logging.error(traceback.format_exc())
+            logger.error(f"Error retrieving calendars: {str(e)}")
+            logger.error(traceback.format_exc())
             return []
 
     def get_events(self, time_min=None, time_max=None, max_results=250, show_deleted=False, calendar_id: str ='primary'):
@@ -106,8 +106,8 @@ class CalendarService():
             return processed_events
             
         except Exception as e:
-            logging.error(f"Error retrieving calendar events: {str(e)}")
-            logging.error(traceback.format_exc())
+            logger.error(f"Error retrieving calendar events: {str(e)}")
+            logger.error(traceback.format_exc())
             return []
         
     def create_event(self, summary: str, start_time: str, end_time: str, 
@@ -163,8 +163,8 @@ class CalendarService():
             return created_event
             
         except Exception as e:
-            logging.error(f"Error creating calendar event: {str(e)}")
-            logging.error(traceback.format_exc())
+            logger.error(f"Error creating calendar event: {str(e)}")
+            logger.error(traceback.format_exc())
             return None
         
     def delete_event(self, event_id: str, send_notifications: bool = True, calendar_id: str = 'primary') -> bool:
@@ -187,6 +187,6 @@ class CalendarService():
             return True
             
         except Exception as e:
-            logging.error(f"Error deleting calendar event {event_id}: {str(e)}")
-            logging.error(traceback.format_exc())
+            logger.error(f"Error deleting calendar event {event_id}: {str(e)}")
+            logger.error(traceback.format_exc())
             return False
