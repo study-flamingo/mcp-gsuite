@@ -1,6 +1,6 @@
 {
   "mcpServers": {
-    "gsuite": {
+    "mcp-gsuite-dev": {
       "command": "uvx",
       "args": [
         "mcp-gsuite"

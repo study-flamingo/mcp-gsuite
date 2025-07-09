@@ -1,14 +1,10 @@
-from fastmcp import FastMCP
 from . import gauth
 from .logs import logger
-from .auth_utils import require_auth
 
-mcp = FastMCP("mcp-gsuite")
-
-# Import tools to register them with the decorator
+from .mcp import mcp
+# Import tools after mcp definition to register them with the decorator
 from . import tools_gmail
 from . import tools_calendar
-
 
 async def init():
     accounts = gauth.get_account_info()

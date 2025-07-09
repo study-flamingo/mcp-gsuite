@@ -32,5 +32,22 @@ dev = [
 [project.scripts]
 mcp-gsuite = "mcp_gsuite.__main__:main"
 
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
 [pytest]
 required_plugins=["asyncio"]
+
+[tool.ruff]  # See https://docs.astral.sh/ruff/configuration/
+exclude = [
+    ".venv",
+    "*.md"
+]
+[tool.ruff.lint]
+ignore = [
+    "E402",  # Module level import not at top of file
+    "E501",  # Line too long
+    "F821",  # Undefined name
+]
+[tool.ruff.format]
+quote-style = "double"

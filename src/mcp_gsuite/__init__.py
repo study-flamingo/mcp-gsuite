@@ -1,8 +1,5 @@
 from .__main__ import main
-from .server import mcp
-
-if __name__ == "__main__":
-    main()
+from .mcp import mcp
 
 __all__ = [
     "mcp"

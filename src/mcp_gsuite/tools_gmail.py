@@ -1,18 +1,14 @@
 from mcp.types import (
-    Tool,
     TextContent,
-    ImageContent,
     EmbeddedResource,
     BlobResourceContents,
 )
 from . import gmail
 import json
-from .server import mcp
 from .auth_utils import require_auth
 import base64
-from typing import Optional
 from pydantic import AnyUrl
-
+from .mcp import mcp
 
 def decode_base64_data(file_data):
     standard_base64_data = file_data.replace("-", "+").replace("_", "/")
@@ -25,7 +21,7 @@ def decode_base64_data(file_data):
 @mcp.tool(name="query_gmail_emails")
 @require_auth
 def query_gmail_emails(
-    __user_id__: str, query: Optional[str] = None, max_results: int = 100
+    __user_id__: str, query: str | None = None, max_results: int = 100
 ) -> str:
     """Query Gmail emails based on an optional search query.
     Returns emails in reverse chronological order (newest first).
@@ -72,7 +68,7 @@ def bulk_get_gmail_emails(__user_id__: str, email_ids: list[str]) -> str:
 @mcp.tool(name="create_gmail_draft")
 @require_auth
 def create_gmail_draft(
-    __user_id__: str, to: str, subject: str, body: str, cc: Optional[list[str]] = None
+    __user_id__: str, to: str, subject: str, body: str, cc: list[str] | None = None
 ) -> str:
     """Creates a draft email message from scratch in Gmail with specified recipient, subject, body, and optional CC recipients.
 
@@ -109,7 +105,7 @@ def reply_gmail_email(
     original_message_id: str,
     reply_body: str,
     send: bool = False,
-    cc: Optional[list[str]] = None,
+    cc: list[str] | None = None,
 ) -> str:
     """Creates a reply to an existing Gmail email message and either sends it or saves as draft.
 
@@ -146,7 +142,7 @@ def get_gmail_attachment(
     attachment_id: str,
     mime_type: str,
     filename: str,
-    save_to_disk: Optional[str] = None,
+    save_to_disk: str | None = None,
 ) -> str | EmbeddedResource:
     """Retrieves a Gmail attachment by its ID."""
     gmail_service = gmail.GmailService(user_id=__user_id__)

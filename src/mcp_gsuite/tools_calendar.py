@@ -4,10 +4,8 @@ from mcp.types import (
 )
 from . import calendar
 import json
-from .server import mcp
 from .auth_utils import require_auth
-from typing import Optional
-
+from .mcp import mcp
 
 @mcp.tool(name="list_calendars")
 @require_auth
@@ -24,8 +22,8 @@ def list_calendars(__user_id__: str) -> str:
 @require_auth
 def get_calendar_events(
     __user_id__: str,
-    time_min: Optional[str] = None,
-    time_max: Optional[str] = None,
+    time_min: str | None = None,
+    time_max: str | None = None,
     max_results: int = 250,
     show_deleted: bool = False,
     calendar_id: str = "primary",
@@ -49,11 +47,11 @@ def create_calendar_event(
     summary: str,
     start_time: str,
     end_time: str,
-    location: Optional[str] = None,
-    description: Optional[str] = None,
-    attendees: Optional[list[str]] = None,
+    location: str | None = None,
+    description: str | None = None,
+    attendees: list[str] | None = None,
     send_notifications: bool = True,
-    timezone: Optional[str] = None,
+    timezone: str | None = None,
     calendar_id: str = "primary",
 ) -> str:
     """Creates a new event in a specified Google Calendar of the specified user."""
