@@ -1,11 +1,14 @@
 {
 	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "../../../../AppData/Roaming/Claude"
-		}
-	],
+        {
+            "path": "."
+        },
+        {
+            "path": "../../../../AppData/Roaming/Claude"
+        },
+        {
+            "path": "../../../.gmail-mcp"
+        }
+    ],
     "settings": {}
 }

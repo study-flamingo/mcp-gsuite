@@ -1,9 +1,7 @@
 from collections.abc import Sequence
-from functools import lru_cache
 import subprocess
 from typing import Any
 import traceback
-from dotenv import load_dotenv
 from mcp.server import Server
 import threading
 import sys
@@ -49,9 +47,6 @@ class OauthListener(BaseHTTPRequestHandler):
         t.start()
 
         
-
-# Load environment variables
-load_dotenv()
 
 from . import tools_gmail
 from . import tools_calendar
@@ -120,6 +115,8 @@ add_tool_handler(tools_calendar.GetCalendarEventsToolHandler())
 add_tool_handler(tools_calendar.CreateCalendarEventToolHandler())
 add_tool_handler(tools_calendar.DeleteCalendarEventToolHandler())
 
+logger.debug(f"tool handlers: {list(tool_handlers.keys())}")
+
 @app.list_tools()
 async def list_tools() -> list[Tool]:
     """List available tools."""
@@ -151,7 +148,6 @@ async def call_tool(name: str, arguments: Any) -> Sequence[TextContent | ImageCo
 
 
 async def init():
-    print(sys.platform)
     accounts = gauth.get_account_info()
     for account in accounts:
         creds = gauth.get_stored_credentials(user_id=account.email)
