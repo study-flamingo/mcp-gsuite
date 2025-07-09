@@ -150,7 +150,7 @@ async def call_tool(name: str, arguments: Any) -> Sequence[TextContent | ImageCo
         raise RuntimeError(f"Caught Exception. Error: {str(e)}")
 
 
-async def main():
+async def init():
     print(sys.platform)
     accounts = gauth.get_account_info()
     for account in accounts:

@@ -35,9 +35,9 @@ class ListCalendarsToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "string",
                 },
-                "required": [toolhandler.USER_ID_ARG]
+                "required": "__user_id__"
             }
         )
 
@@ -67,7 +67,7 @@ class GetCalendarEventsToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "__user_id__",
                     "__calendar_id__": get_calendar_id_arg_schema(),
                     "time_min": {
                         "type": "string",
@@ -127,7 +127,7 @@ class CreateCalendarEventToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "__user_id__",
                     "__calendar_id__": get_calendar_id_arg_schema(),
                     "summary": {
                         "type": "string",
@@ -211,7 +211,7 @@ class DeleteCalendarEventToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "__user_id__",
                     "__calendar_id__": get_calendar_id_arg_schema(),
                     "event_id": {
                         "type": "string",

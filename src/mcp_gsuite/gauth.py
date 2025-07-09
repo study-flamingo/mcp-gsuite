@@ -14,12 +14,25 @@ import argparse
 
 from .logs import logger
 
+from dotenv import load_dotenv
+
+# Load .env file if present
+if load_dotenv():
+    logger.debug("Loaded .env file from project root")
+
+
+GAUTH_FILE_PATH = os.getenv("GAUTH_FILE_PATH", "./.gauth.json")
+ACCOUNTS_FILE_PATH = os.getenv("ACCOUNTS_FILE_PATH", "./.accounts.json")
+CREDENTIALS_DIR_PATH = os.getenv("CREDENTIALS_DIR_PATH", ".")
+
+
+
 def get_gauth_file() -> str:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--gauth-file",
         type=str,
-        default="./.gauth.json",
+        default=GAUTH_FILE_PATH,
         help="Path to client secrets file",
     )
     args, _ = parser.parse_known_args()
@@ -55,7 +68,7 @@ def get_accounts_file() -> str:
     parser.add_argument(
         "--accounts-file",
         type=str,
-        default="./.accounts.json",
+        default=ACCOUNTS_FILE_PATH,
         help="Path to accounts configuration file",
     )
     args, _ = parser.parse_known_args()
@@ -99,7 +112,7 @@ def get_credentials_dir() -> str:
     parser.add_argument(
         "--credentials-dir",
         type=str,
-        default=".",
+        default=CREDENTIALS_DIR_PATH,
         help="Directory to store OAuth2 credentials",
     )
     args, _ = parser.parse_known_args()

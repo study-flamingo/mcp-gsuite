@@ -28,4 +28,4 @@ dev = [
 ]
 
 [project.scripts]
-mcp-gsuite = "mcp_gsuite:main"
+mcp-gsuite = "mcp_gsuite.__main__:main"

@@ -5,35 +5,32 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Tools test",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "src/mcp_gsuite/tests/test_tools.py",
+            "cwd": "${workspaceFolder}",
+            "console": "integratedTerminal"
+        },
+        {
+            "command": "npx -y @mcpjam/inspector",
+            "name": "MCP Inspector",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
             "name": "Python Debugger: Module",
             "type": "debugpy",
             "request": "launch",
-            "args": [
-                "mcp-gsuite",
-                "--gauth-file",
-                "C:/Users/JoelCasimir/.gmail-mcp/gcp-oauth.keys.json",
-                "--accounts-file",
-                "C:/Users/JoelCasimir/.gmail-mcp/.accounts.json",
-                "--credentials-dir",
-                "C:/Users/JoelCasimir/.gmail-mcp"
-            ],
-            "module": "mcp_gsuite"
-        },
-        {
-            "name": "Python Debugger: Current File with Arguments",
-            "type": "debugpy",
-            "request": "launch",
-            "program": "./src/mcp_gsuite.__main__.py",
             "cwd": "${workspaceFolder}",
-            "console": "integratedTerminal",
+            "module": "mcp_gsuite",
             "args": [
-                "mcp-gsuite",
                 "--gauth-file",
-                "C:/Users/JoelCasimir/.gmail-mcp/gcp-oauth.keys.json",
+                "C:/Users/joelc/.gmail-mcp/gcp-oauth.keys.json",
                 "--accounts-file",
-                "C:/Users/JoelCasimir/.gmail-mcp/.accounts.json",
+                "C:/Users/joelc/.gmail-mcp/.accounts.json",
                 "--credentials-dir",
-                "C:/Users/JoelCasimir/.gmail-mcp"
+                "C:/Users/joelc/.gmail-mcp"
             ]
         }
     ]

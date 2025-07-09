@@ -32,7 +32,7 @@ class QueryEmailsToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "__user_id__",
                     "query": {
                         "type": "string",
                         "description": """Gmail search query (optional). Examples:
@@ -84,7 +84,7 @@ class GetEmailByIdToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "__user_id__",
                     "email_id": {
                         "type": "string",
                         "description": "The ID of the Gmail message to retrieve"
@@ -132,7 +132,7 @@ class BulkGetEmailsByIdsToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "__user_id__",
                     "email_ids": {
                         "type": "array",
                         "items": {
@@ -191,7 +191,7 @@ class CreateDraftToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "__user_id__",
                     "to": {
                         "type": "string",
                         "description": "Email address of the recipient"
@@ -258,7 +258,7 @@ class DeleteDraftToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "__user_id__",
                     "draft_id": {
                         "type": "string",
                         "description": "The ID of the draft to delete"
@@ -299,7 +299,7 @@ class ReplyEmailToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "__user_id__",
                     "original_message_id": {
                         "type": "string",
                         "description": "The ID of the Gmail message to reply to"
@@ -335,7 +335,7 @@ class ReplyEmailToolHandler(toolhandler.ToolHandler):
         gmail_service = gmail.GmailService(user_id=user_id)
         
         # First get the original message to extract necessary information
-        original_message = gmail_service.get_email_by_id(args["original_message_id"])
+        original_message, _ = gmail_service.get_email_by_id_with_attachments(args["original_message_id"])
         if original_message is None:
             return [
                 TextContent(
@@ -378,7 +378,7 @@ class GetAttachmentToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "__user_id__",
                     "message_id": {
                         "type": "string",
                         "description": "The ID of the Gmail message containing the attachment"
@@ -463,7 +463,7 @@ class BulkSaveAttachmentsToolHandler(toolhandler.ToolHandler):
             inputSchema={
                 "type": "object",
                 "properties": {
-                    "__user_id__": self.get_user_id_arg_schema(),
+                    "__user_id__": "__user_id__",
                     "attachments": {
                         "type": "array",
                         "items": {
