@@ -1,253 +1,96 @@
-from collections.abc import Sequence
 from mcp.types import (
     Tool,
     TextContent,
-    ImageContent,
-    EmbeddedResource,
-    LoggingLevel,
 )
-from . import gauth
 from . import calendar
 import json
-from . import toolhandler
-
-CALENDAR_ID_ARG="__calendar_id__"
-
-def get_calendar_id_arg_schema() -> dict[str, str]:
-    return {
-        "type": "string",
-        "description": """Optional ID of the specific agenda for which you are executing this action.
-                          If not provided, the default calendar is being used. 
-                          If not known, the specific calendar id can be retrieved with the list_calendars tool""",
-        "default": "primary"
-    }
+from .server import mcp
+from .auth_utils import require_auth
+from typing import Optional
 
 
-class ListCalendarsToolHandler(toolhandler.ToolHandler):
-    def __init__(self):
-        super().__init__("list_calendars")
+@mcp.tool(name="list_calendars")
+@require_auth
+def list_calendars(__user_id__: str) -> str:
+    """Lists all calendars accessible by the user.
+    Call it before any other tool whenever the user specifies a particular agenda (Family, Holidays, etc.).
+    """
+    calendar_service = calendar.CalendarService(user_id=__user_id__)
+    calendars = calendar_service.list_calendars()
+    return json.dumps(calendars, indent=2)
 
-    def get_tool_description(self) -> Tool:
-        return Tool(
-            name=self.name,
-            description="""Lists all calendars accessible by the user. 
-            Call it before any other tool whenever the user specifies a particular agenda (Family, Holidays, etc.).""",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "__user_id__": "string",
-                },
-                "required": "__user_id__"
-            }
-        )
 
-    def run_tool(self, args: dict) -> Sequence[TextContent | ImageContent | EmbeddedResource]:
-        user_id = args.get(toolhandler.USER_ID_ARG)
-        if not user_id:
-            raise RuntimeError(f"Missing required argument: {toolhandler.USER_ID_ARG}")
+@mcp.tool(name="get_calendar_events")
+@require_auth
+def get_calendar_events(
+    __user_id__: str,
+    time_min: Optional[str] = None,
+    time_max: Optional[str] = None,
+    max_results: int = 250,
+    show_deleted: bool = False,
+    calendar_id: str = "primary",
+) -> str:
+    """Retrieves calendar events from the user's Google Calendar within a specified time range."""
+    calendar_service = calendar.CalendarService(user_id=__user_id__)
+    events = calendar_service.get_events(
+        time_min=time_min,
+        time_max=time_max,
+        max_results=max_results,
+        show_deleted=show_deleted,
+        calendar_id=calendar_id,
+    )
+    return json.dumps(events, indent=2)
 
-        calendar_service = calendar.CalendarService(user_id=user_id)
-        calendars = calendar_service.list_calendars()
 
-        return [
-            TextContent(
-                type="text",
-                text=json.dumps(calendars, indent=2)
-            )
-        ]
+@mcp.tool(name="create_calendar_event")
+@require_auth
+def create_calendar_event(
+    __user_id__: str,
+    summary: str,
+    start_time: str,
+    end_time: str,
+    location: Optional[str] = None,
+    description: Optional[str] = None,
+    attendees: Optional[list[str]] = None,
+    send_notifications: bool = True,
+    timezone: Optional[str] = None,
+    calendar_id: str = "primary",
+) -> str:
+    """Creates a new event in a specified Google Calendar of the specified user."""
+    calendar_service = calendar.CalendarService(user_id=__user_id__)
+    event = calendar_service.create_event(
+        summary=summary,
+        start_time=start_time,
+        end_time=end_time,
+        location=location,
+        description=description,
+        attendees=attendees or [],
+        send_notifications=send_notifications,
+        timezone=timezone,
+        calendar_id=calendar_id,
+    )
+    return json.dumps(event, indent=2)
 
-class GetCalendarEventsToolHandler(toolhandler.ToolHandler):
-    def __init__(self):
-        super().__init__("get_calendar_events")
 
-    def get_tool_description(self) -> Tool:
-        return Tool(
-            name=self.name,
-            description="Retrieves calendar events from the user's Google Calendar within a specified time range.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "__user_id__": "__user_id__",
-                    "__calendar_id__": get_calendar_id_arg_schema(),
-                    "time_min": {
-                        "type": "string",
-                        "description": "Start time in RFC3339 format (e.g. 2024-12-01T00:00:00Z). Defaults to current time if not specified."
-                    },
-                    "time_max": {
-                        "type": "string", 
-                        "description": "End time in RFC3339 format (e.g. 2024-12-31T23:59:59Z). Optional."
-                    },
-                    "max_results": {
-                        "type": "integer",
-                        "description": "Maximum number of events to return (1-2500)",
-                        "minimum": 1,
-                        "maximum": 2500,
-                        "default": 250
-                    },
-                    "show_deleted": {
-                        "type": "boolean",
-                        "description": "Whether to include deleted events",
-                        "default": False
-                    }
-                },
-                "required": [toolhandler.USER_ID_ARG]
-            }
-        )
-
-    def run_tool(self, args: dict) -> Sequence[TextContent | ImageContent | EmbeddedResource]:
-        
-        user_id = args.get(toolhandler.USER_ID_ARG)
-        if not user_id:
-            raise RuntimeError(f"Missing required argument: {toolhandler.USER_ID_ARG}")
-        
-        calendar_service = calendar.CalendarService(user_id=user_id)
-        events = calendar_service.get_events(
-            time_min=args.get('time_min'),
-            time_max=args.get('time_max'),
-            max_results=args.get('max_results', 250),
-            show_deleted=args.get('show_deleted', False),
-            calendar_id=args.get(CALENDAR_ID_ARG, 'primary'),
-        )
-
-        return [
-            TextContent(
-                type="text",
-                text=json.dumps(events, indent=2)
-            )
-        ]
-
-class CreateCalendarEventToolHandler(toolhandler.ToolHandler):
-    def __init__(self):
-        super().__init__("create_calendar_event")
-
-    def get_tool_description(self) -> Tool:
-        return Tool(
-            name=self.name,
-            description="Creates a new event in a specified Google Calendar of the specified user.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "__user_id__": "__user_id__",
-                    "__calendar_id__": get_calendar_id_arg_schema(),
-                    "summary": {
-                        "type": "string",
-                        "description": "Title of the event"
-                    },
-                    "location": {
-                        "type": "string",
-                        "description": "Location of the event (optional)"
-                    },
-                    "description": {
-                        "type": "string",
-                        "description": "Description or notes for the event (optional)"
-                    },
-                    "start_time": {
-                        "type": "string",
-                        "description": "Start time in RFC3339 format (e.g. 2024-12-01T10:00:00Z)"
-                    },
-                    "end_time": {
-                        "type": "string",
-                        "description": "End time in RFC3339 format (e.g. 2024-12-01T11:00:00Z)"
-                    },
-                    "attendees": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "description": "List of attendee email addresses (optional)"
-                    },
-                    "send_notifications": {
-                        "type": "boolean",
-                        "description": "Whether to send notifications to attendees",
-                        "default": True
-                    },
-                    "timezone": {
-                        "type": "string",
-                        "description": "Timezone for the event (e.g. 'America/New_York'). Defaults to UTC if not specified."
-                    }
-                },
-                "required": [toolhandler.USER_ID_ARG, "summary", "start_time", "end_time"]
-            }
-        )
-
-    def run_tool(self, args: dict) -> Sequence[TextContent | ImageContent | EmbeddedResource]:
-        # Validate required arguments
-        required = ["summary", "start_time", "end_time"]
-        if not all(key in args for key in required):
-            raise RuntimeError(f"Missing required arguments: {', '.join(required)}")
-
-        user_id = args.get(toolhandler.USER_ID_ARG)
-        if not user_id:
-            raise RuntimeError(f"Missing required argument: {toolhandler.USER_ID_ARG}")
-
-        calendar_service = calendar.CalendarService(user_id=user_id)
-        event = calendar_service.create_event(
-            summary=args["summary"],
-            start_time=args["start_time"],
-            end_time=args["end_time"],
-            location=args.get("location"),
-            description=args.get("description"),
-            attendees=args.get("attendees", []),
-            send_notifications=args.get("send_notifications", True),
-            timezone=args.get("timezone"),
-            calendar_id=args.get(CALENDAR_ID_ARG, 'primary'),
-        )
-
-        return [
-            TextContent(
-                type="text",
-                text=json.dumps(event, indent=2)
-            )
-        ]
-    
-class DeleteCalendarEventToolHandler(toolhandler.ToolHandler):
-    def __init__(self):
-        super().__init__("delete_calendar_event")
-
-    def get_tool_description(self) -> Tool:
-        return Tool(
-            name=self.name,
-            description="Deletes an event from the user's Google Calendar by its event ID.",
-            inputSchema={
-                "type": "object",
-                "properties": {
-                    "__user_id__": "__user_id__",
-                    "__calendar_id__": get_calendar_id_arg_schema(),
-                    "event_id": {
-                        "type": "string",
-                        "description": "The ID of the calendar event to delete"
-                    },
-                    "send_notifications": {
-                        "type": "boolean",
-                        "description": "Whether to send cancellation notifications to attendees",
-                        "default": True
-                    }
-                },
-                "required": [toolhandler.USER_ID_ARG, "event_id"]
-            }
-        )
-
-    def run_tool(self, args: dict) -> Sequence[TextContent | ImageContent | EmbeddedResource]:
-        if "event_id" not in args:
-            raise RuntimeError("Missing required argument: event_id")
-        
-        user_id = args.get(toolhandler.USER_ID_ARG)
-        if not user_id:
-            raise RuntimeError(f"Missing required argument: {toolhandler.USER_ID_ARG}")
-
-        calendar_service = calendar.CalendarService(user_id=user_id)
-        success = calendar_service.delete_event(
-            event_id=args["event_id"],
-            send_notifications=args.get("send_notifications", True),
-            calendar_id=args.get(CALENDAR_ID_ARG, 'primary'),
-        )
-
-        return [
-            TextContent(
-                type="text",
-                text=json.dumps({
-                    "success": success,
-                    "message": "Event successfully deleted" if success else "Failed to delete event"
-                }, indent=2)
-            )
-        ]
+@mcp.tool(name="delete_calendar_event")
+@require_auth
+def delete_calendar_event(
+    __user_id__: str,
+    event_id: str,
+    send_notifications: bool = True,
+    calendar_id: str = "primary",
+) -> str:
+    """Deletes an event from the user's Google Calendar by its event ID."""
+    calendar_service = calendar.CalendarService(user_id=__user_id__)
+    success = calendar_service.delete_event(
+        event_id=event_id,
+        send_notifications=send_notifications,
+        calendar_id=calendar_id,
+    )
+    return json.dumps(
+        {
+            "success": success,
+            "message": "Event successfully deleted" if success else "Failed to delete event",
+        },
+        indent=2,
+    )

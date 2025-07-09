@@ -4,10 +4,10 @@
             "path": "."
         },
         {
-            "path": "../../../../AppData/Roaming/Claude"
+            "path": "../../../.gmail-mcp"
         },
         {
-            "path": "../../../.gmail-mcp"
+            "path": "../../../AppData/Roaming/Claude"
         }
     ],
     "settings": {}

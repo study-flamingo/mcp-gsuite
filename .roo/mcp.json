@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "gsuite": {
+      "command": "uvx",
+      "args": [
+        "mcp-gsuite"
+      ],
+      "disabled": true,
+      "alwaysAllow": []
+    }
+  }
+}

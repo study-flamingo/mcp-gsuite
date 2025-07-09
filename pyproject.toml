@@ -6,9 +6,9 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
  "beautifulsoup4>=4.12.3",
+ "fastmcp>=2.10.3",
  "google-api-python-client>=2.154.0",
  "httplib2>=0.22.0",
- "mcp>=1.3.0",
  "oauth2client==4.1.3",
  "python-dotenv>=1.0.1",
  "pytz>=2024.2",
@@ -25,7 +25,12 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "pyright>=1.1.389",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.0.0",
 ]
 
 [project.scripts]
 mcp-gsuite = "mcp_gsuite.__main__:main"
+
+[pytest]
+required_plugins=["asyncio"]

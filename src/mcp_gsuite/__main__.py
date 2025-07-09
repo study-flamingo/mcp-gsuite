@@ -1,3 +1,5 @@
+"""Main entry point for the package."""
+
 from .server import init
 import asyncio
 
