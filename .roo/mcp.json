@@ -5,7 +5,7 @@
       "args": [
         "mcp-gsuite"
       ],
-      "disabled": true,
+      "disabled": false,
       "alwaysAllow": []
     }
   }

@@ -1,7 +1,3 @@
-from mcp.types import (
-    Tool,
-    TextContent,
-)
 from . import calendar
 import json
 from .auth_utils import require_auth
