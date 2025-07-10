@@ -1,14 +1,14 @@
+"""Helper utility for updating development documentation pulled from online sources."""
+
 import requests
 import os
 import json
+import traceback
+
+DOCS_DIR = os.path.join(os.path.dirname(__file__), "../../../docs")
 
 
-def update_dev_docs(
-    mcp_docs_dir: str = "docs",
-    fastmcp_docs_dir: str = "docs",
-    mcp_docs_filename: str = "MCP_llms.txt",
-    fastmcp_docs_filename: str = "FastMCP_docs.txt"
-    ):
+def update_dev_docs():
     """
     Updates the following docs from the given URLs:
     
@@ -19,76 +19,67 @@ def update_dev_docs(
     - Source: [https://gofastmcp.com/llms-full.txt](https://gofastmcp.com/llms-full.txt)
     
     """
-    docs: list[dict] = []
+    global DOCS_DIR
+    docs_dir = os.path.normpath(DOCS_DIR)
     
+    
+    # Ensure the docs directory exists
+    os.makedirs(docs_dir, exist_ok=True)
+
+    docs: dict = {}
+    # Load settings
     try:
-        with open("docs.json", "r") as f:
+        with open(os.path.join(os.path.dirname(__file__), "docs.json"), "r") as f:
             docs = json.load(f)
         print("Successfully loaded docs.json 🎉")
     except FileNotFoundError:
-        print("No docs configured! Create a docs.json file with the following format:")
+        print(f"No docs.json found in {docs_dir}! Create a docs.json file with the following format:")
         print("""
+    {
+        "docs":
+        [
             {
-                "docs":
-                [
-                    {
-                        "title": "<title of the doc>"
-                        "url": "<url of the doc>"
-                    },
-                    add more...
-                ]
-            }
+                "title": "<title of the doc>"
+                "url": "<url of the doc>"
+            },
+            add more...
+        ]
+}
             """)
         exit(1)
     except Exception as e:
-        print(f"Error loading docs.json: {e.with_traceback}")
+        print(f"Error loading docs.json: {e}")
+        print(traceback.format_exc()) # For full traceback
         exit(1)
 
-    for d in docs:        
+    print(f"Found settings for {len(docs.get('docs', []))} docs to update")
+
+    # Download the docs
+    for doc_item in docs.get("docs", []):
+        name = doc_item.get("title")
+        url = doc_item.get("url")
+        
+        if not name or not url:
+            print(f"Skipping malformed doc entry: {doc_item}")
+            continue
+
         try:
-            url = d["url"]
-            title = d["title"]
-        except Exception as e:
-            print(f"Error loading docs.json: {e.with_traceback}")
-            exit(1)
+            response = requests.get(url)
+            response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
 
+            doc_filepath = os.path.join(docs_dir, name)
             
-
-    mcp_docs_url = "https://modelcontextprotocol.io/llms-full.txt"
-    mcp_docs_path = os.path.abspath(os.path.join(mcp_docs_dir, mcp_docs_filename))
-    mcp_docs_path = os.path.join(mcp_docs_dir, mcp_docs_filename)
-    
-    fastmcp_docs_url = "https://gofastmcp.com/llms-full.txt"
-    fastmcp_docs_path = os.path.abspath(os.path.join(fastmcp_docs_dir, fastmcp_docs_filename))
-    
-
-    try:
-        # MCP_llms.txt
-        response = requests.get(mcp_docs_url)
-        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
-
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(mcp_docs_path), exist_ok=True)
-        
-        with open(mcp_docs_path, "x", encoding="utf-8") as f:
-            f.write(response.text)
-        print(f"Successfully updated {mcp_docs_path}")
-
-        # FastMCP_llms.txt
-        response = requests.get(fastmcp_docs_url)
-        response.raise_for_status()  # Raise an HTTPError for bad responses (4xx or 5xx)
-
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(fastmcp_docs_path), exist_ok=True)
-
-        with open(fastmcp_docs_path, "x", encoding="utf-8") as f:
-            f.write(response.text)
-        print(f"Successfully updated {fastmcp_docs_path}")
-        
-    except requests.exceptions.RequestException as e:
-        print(f"Error downloading the file: {e}")
-    except IOError as e:
-        print(f"Error writing to file {fastmcp_docs_path}: {e}")
+            with open(doc_filepath, "w", encoding="utf-8") as f:
+                f.write(response.text)
+            print(f"Successfully updated {doc_filepath}")
+        except requests.exceptions.RequestException as e:
+            print(f"Error downloading the file: {e}")
+        except IOError as e:
+            print(f"Error writing to file {doc_filepath}: {e}")
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            print(traceback.format_exc())
 
 if __name__ == "__main__":
     update_dev_docs()
+    

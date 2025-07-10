@@ -128,14 +128,14 @@ class GmailService():
             logger.error(f"Error extracting body: {str(e)}")
             return None
 
-    def query_emails(self, query=None, max_results=100):
+    def query_emails(self, query=None, max_results=10):
         """
         Query emails from Gmail based on a search query.
         
         Args:
             query (str, optional): Gmail search query (e.g., 'is:unread', 'from:example@gmail.com')
                                 If None, returns all emails
-            max_results (int): Maximum number of emails to retrieve (1-500, default: 100)
+            max_results (int): Maximum number of emails to retrieve (1-500, default: 10)
         
         Returns:
             list: List of parsed email messages, newest first

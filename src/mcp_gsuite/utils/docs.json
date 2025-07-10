@@ -1,11 +1,11 @@
 {
     "docs": [
         {
-            "title": "FastMCP_docs.txt",
+            "title": "FastMCP_docs.md",
             "url": "https://modelcontextprotocol.io/llms-full.txt"
         },
         {
-            "title": "MCP_llms.txt",
+            "title": "MCP_llms.md",
             "url": "https://modelcontextprotocol.io/llms-full.txt"
         }
     ]
