@@ -1,6 +1,7 @@
 import requests
 import os
-import sys
+import json
+
 
 def update_dev_docs(
     mcp_docs_dir: str = "docs",
@@ -18,6 +19,41 @@ def update_dev_docs(
     - Source: [https://gofastmcp.com/llms-full.txt](https://gofastmcp.com/llms-full.txt)
     
     """
+    docs: list[dict] = []
+    
+    try:
+        with open("docs.json", "r") as f:
+            docs = json.load(f)
+        print("Successfully loaded docs.json 🎉")
+    except FileNotFoundError:
+        print("No docs configured! Create a docs.json file with the following format:")
+        print("""
+            {
+                "docs":
+                [
+                    {
+                        "title": "<title of the doc>"
+                        "url": "<url of the doc>"
+                    },
+                    add more...
+                ]
+            }
+            """)
+        exit(1)
+    except Exception as e:
+        print(f"Error loading docs.json: {e.with_traceback}")
+        exit(1)
+
+    for d in docs:        
+        try:
+            url = d["url"]
+            title = d["title"]
+        except Exception as e:
+            print(f"Error loading docs.json: {e.with_traceback}")
+            exit(1)
+
+            
+
     mcp_docs_url = "https://modelcontextprotocol.io/llms-full.txt"
     mcp_docs_path = os.path.abspath(os.path.join(mcp_docs_dir, mcp_docs_filename))
     mcp_docs_path = os.path.join(mcp_docs_dir, mcp_docs_filename)

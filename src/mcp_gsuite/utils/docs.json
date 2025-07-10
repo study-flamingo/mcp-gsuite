@@ -1,0 +1,12 @@
+{
+    "docs": [
+        {
+            "title": "FastMCP_docs.txt",
+            "url": "https://modelcontextprotocol.io/llms-full.txt"
+        },
+        {
+            "title": "MCP_llms.txt",
+            "url": "https://modelcontextprotocol.io/llms-full.txt"
+        }
+    ]
+}
