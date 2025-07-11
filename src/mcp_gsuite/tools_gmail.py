@@ -3,7 +3,7 @@ from mcp.types import (
     EmbeddedResource,
     BlobResourceContents,
 )
-from . import gmail
+from .api import gmail
 import json
 from .auth_utils import require_auth
 import base64

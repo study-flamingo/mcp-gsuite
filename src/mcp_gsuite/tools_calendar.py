@@ -1,4 +1,4 @@
-from . import calendar
+from .api import calendar
 import json
 from .auth_utils import require_auth
 from .mcp import mcp

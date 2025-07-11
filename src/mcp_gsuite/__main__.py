@@ -8,8 +8,8 @@ def main():
     """Main entry point for the package."""
     try:
         asyncio.run(init())
-    except RuntimeError as e:
-        logger.critical(str(e))
+    except Exception as e:
+        logger.critical(str(e.with_traceback))
 
 if __name__ == "__main__":
     main()
