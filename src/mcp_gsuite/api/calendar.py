@@ -1,6 +1,6 @@
 from googleapiclient.discovery import build
-from . import gauth
-from .logs import logger
+from .. import gauth
+from ..logs import logger
 import traceback
 from datetime import datetime
 import pytz
