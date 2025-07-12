@@ -1,7 +1,12 @@
-# mcp-gsuite MCP server
+# GSuite MCP server
+mcp-gsuite
 
 [![smithery badge](https://smithery.ai/badge/mcp-gsuite)](https://smithery.ai/server/mcp-gsuite)
 MCP server to interact with Google products.
+
+# Changes
+
+Refactored to utilize FastMCP 2.10
 
 ## Example prompts
 
@@ -24,11 +29,11 @@ Right now, this MCP server supports Gmail and Calendar integration with the foll
 * Manage multiple calendars
 * Get calendar events within specified time ranges
 * Create calendar events with:
-  + Title, start/end times
-  + Optional location and description
-  + Optional attendees
-  + Custom timezone support
-  + Notification preferences
+  * Title, start/end times
+  * Optional location and description
+  * Optional attendees
+  * Custom timezone support
+  * Notification preferences
 * Delete calendar events
 
 Example prompts you can try:
@@ -61,16 +66,15 @@ npx -y @smithery/cli install mcp-gsuite --client claude
 Google Workspace (G Suite) APIs require OAuth2 authorization. Follow these steps to set up authentication:
 
 1. Create OAuth2 Credentials:
-   - Go to the [Google Cloud Console](https://console.cloud.google.com/)
-   - Create a new project or select an existing one
-   - Enable the Gmail API and Google Calendar API for your project
-   - Go to "Credentials" → "Create Credentials" → "OAuth client ID"
-   - Select "Desktop app" or "Web application" as the application type
-   - Configure the OAuth consent screen with required information
-   - Add authorized redirect URIs (include `http://localhost:4100/code` for local development)
+   * Go to the [Google Cloud Console](https://console.cloud.google.com/)
+   * Create a new project or select an existing one
+   * Enable the Gmail API and Google Calendar API for your project
+   * Go to "Credentials" → "Create Credentials" → "OAuth client ID"
+   * Select "Desktop app" or "Web application" as the application type
+   * Configure the OAuth consent screen with required information
+   * Add authorized redirect URIs (include `http://localhost:4100/code` for local development)
 
 2. Required OAuth2 Scopes:
-   
 
 ```json
    [
@@ -122,7 +126,6 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
 <details>
   <summary>Development/Unpublished Servers Configuration</summary>
   
-
 ```json
 {
   "mcpServers": {
@@ -138,7 +141,6 @@ On Windows: `%APPDATA%/Claude/claude_desktop_config.json`
   }
 }
 ```
-
 
 Note: You can also use the `uv run mcp-gsuite --accounts-file /path/to/custom/.accounts.json` to specify a different accounts file or `--credentials-dir /path/to/custom/credentials` to specify a different credentials directory.
 
@@ -167,7 +169,6 @@ Note: You can also use the `uv run mcp-gsuite --accounts-file /path/to/custom/.a
 <details>
   <summary>Published Servers Configuration</summary>
   
-
 ```json
 {
   "mcpServers": {
@@ -240,7 +241,7 @@ Note: You'll need to set PyPI credentials via environment variables or command f
 Since MCP servers run over stdio, debugging can be challenging. For the best debugging
 experience, we strongly recommend using the [MCP Inspector](https://github.com/modelcontextprotocol/inspector).
 
-You can launch the MCP Inspector via [ `npm` ](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) with this command:
+You can launch the MCP Inspector via [`npm`](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) with this command:
 
 ```bash
 npx @modelcontextprotocol/inspector uv --directory /path/to/mcp-gsuite run mcp-gsuite
