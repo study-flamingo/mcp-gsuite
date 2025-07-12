@@ -210,4 +210,9 @@ __marimo__/
 .streamlit/secrets.toml
 
 .vscode/
-.code-workspace
+workspace
+
+*credentials.json
+gcp-oauth.keys.json
+.oauth2.*
+.accounts.json

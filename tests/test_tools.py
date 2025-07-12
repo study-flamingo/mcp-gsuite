@@ -8,7 +8,7 @@ import os
 
 # Import the tools directly
 from mcp_gsuite import tools_gmail
-from mcp_gsuite import tools_calendar
+from mcp_gsuite import calendar_tools
 from mcp.types import EmbeddedResource, BlobResourceContents, TextContent
 from pydantic import AnyUrl
 

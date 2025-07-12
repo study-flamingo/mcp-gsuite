@@ -30,7 +30,7 @@ dev = [
 ]
 
 [project.scripts]
-mcp-gsuite = "mcp_gsuite.__main__:main"
+mcp-gsuite-dev = "mcp_gsuite.__main__:main"
 mcp-gsuite-docs = "mcp_gsuite.utils.update_docs:update_dev_docs"
 
 [tool.pytest.ini_options]

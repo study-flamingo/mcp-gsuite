@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 
 # Load .env file if present
 if load_dotenv():
-    logger.debug("Loaded .env file from project root")
+    logger.info("🌐 Loaded .env file from project root")
 
 
 GAUTH_FILE_PATH = os.getenv("GAUTH_FILE_PATH", "./.gauth.json")
@@ -55,6 +55,9 @@ class AccountInfo(pydantic.BaseModel):
     email: str
     account_type: str
     extra_info: str
+
+    def __str__(self):
+        return self.to_description()
 
     def __init__(self, email: str, account_type: str, extra_info: str = ""):
         super().__init__(email=email, account_type=account_type, extra_info=extra_info)

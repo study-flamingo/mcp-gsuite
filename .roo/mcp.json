@@ -6,7 +6,10 @@
         "mcp-gsuite"
       ],
       "disabled": false,
-      "alwaysAllow": []
+      "alwaysAllow": [
+        "query_gmail_emails",
+        "list_calendars"
+      ]
     }
   }
 }

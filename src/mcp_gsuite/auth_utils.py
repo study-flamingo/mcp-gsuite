@@ -64,20 +64,18 @@ def setup_oauth2(user_id: str):
         start_auth_flow(user_id=user_id)
     else:
         if credentials.access_token_expired:
-            logger.error("credentials expired. try refresh")
+            credentials.refresh(gauth.httplib2.Http())
 
         # this call refreshes access token
         gauth.get_user_info(credentials=credentials)
         gauth.store_credentials(credentials=credentials, user_id=user_id)
 
 
-def require_auth(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        user_id = kwargs.get(USER_ID_ARG)
-        if not user_id:
-            raise RuntimeError(f"Missing required argument: {USER_ID_ARG}")
-        setup_oauth2(user_id=user_id)
-        return func(*args, **kwargs)
-
-    return wrapper
+def require_auth(id: str):
+    if not id:
+        raise RuntimeError(f"Missing required argument: {USER_ID_ARG}")
+    try:
+        logger.debug(f"setup_oauth2 called with user_id: {id}")
+        setup_oauth2(user_id=id)
+    except Exception as e:
+        return f"setup_oauth2 error: {str(e)}"

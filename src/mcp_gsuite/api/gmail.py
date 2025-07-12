@@ -169,7 +169,7 @@ class GmailService():
         except Exception as e:
             logger.error(f"Error reading emails: {str(e)}")
             logger.error(traceback.format_exc())
-            return []
+            raise e # Re-raise the exception to be caught by the tool
         
     def get_email_by_id_with_attachments(self, email_id: str) -> Tuple[dict, dict] | Tuple[None, dict]:
         """
